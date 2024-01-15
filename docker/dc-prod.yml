@@ -1,0 +1,43 @@
+version: "3.8"
+
+# Up production container to team lead and client can homolog the features
+services:
+  sgrid-api-prod:
+    container_name: sgrid-api-prod
+    build:
+      context: ../
+      dockerfile: ./docker/dockerfiles/Dockerfile.api
+      target: production
+    command: npm run start
+    env_file:
+      - ../envs/.production.env
+    networks:
+      - sgrid-network
+    ports:
+      - 3000:3000
+    depends_on:
+      - sgrid-postgres-prod
+
+  sgrid-postgres-prod:
+    container_name: sgrid-postgres-prod
+    build:
+      context: ../
+      dockerfile: ./docker/dockerfiles/postgres/Dockerfile.postgres
+    env_file:
+      - ../envs/.production.env
+    command:
+      - "-p 5432"
+    networks:
+      - sgrid-network
+    ports:
+      - 5432:5432
+    volumes:
+      - sgrid_prod_db_sql_prod:/var/lib/postgresql/data
+
+networks:
+  sgrid-network:
+    name: docker_sgrid-network
+    external: true
+
+volumes:
+  sgrid_prod_db_sql_prod:

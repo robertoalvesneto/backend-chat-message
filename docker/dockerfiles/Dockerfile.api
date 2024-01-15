@@ -1,0 +1,40 @@
+# --- DEVELOPMENT ENVIRONMENT
+FROM node:18.13.0 AS development
+
+WORKDIR /usr/src/api
+
+COPY ./api/package*.json ./ 
+COPY ./api/tsconfig*.json ./ 
+
+RUN npm i --omit=dev --ignore-scripts
+
+COPY ./api/src ./src
+COPY ./envs/.development.env ./
+
+RUN npm uninstall bcrypt
+RUN npm install bcrypt
+RUN npm run build
+# --->
+
+# <--- PRODUCTION ENVIRONMENT
+FROM node:18.13.0 as production
+
+WORKDIR /usr/src/api
+
+RUN npm install -g @nestjs/cli
+
+COPY ./api/package*.json ./
+COPY ./api/tsconfig*.json ./ 
+
+COPY ./envs/.production.env ./.env
+
+RUN npm install --production --ignore-scripts
+
+# fix BCRYPT problem
+RUN npm uninstall bcrypt
+RUN npm install bcrypt
+
+COPY ./api/src ./src
+
+RUN nest build
+# ---/>

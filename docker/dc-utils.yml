@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  mongo-express:
+    image: mongo-express
+    env_file:
+      - ../envs/.utils.env
+    ports:
+      - "8081:8081"
+    networks:
+      - echo-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    env_file:
+      - ../envs/.utils.env
+    networks:
+      - echo-network
+    ports:
+      - "8080:80"
+
+networks:
+  echo-network:
+    name: echo-network
+    external: true
