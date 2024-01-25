@@ -10,18 +10,15 @@ import { User } from './entity/user.entity';
 
 // Functions
 import { hash } from 'src/common/function/hash.function';
-import { MqttService } from 'src/queue/mqtt/mqtt.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
-    private readonly mqttService: MqttService,
   ) {}
 
   getOne(id: string): Promise<User> {
-    this.mqttService.publish('message.send', { message: 'message' }, 2);
     return this.userRepo.findOne({ where: { id } });
   }
 
@@ -33,6 +30,9 @@ export class UserService {
   }
 
   update(data: UserDto): Promise<UpdateResult> {
-    return this.userRepo.update(data.id, { password: hash(data.password) });
+    return this.userRepo.update(data.id, {
+      password: hash(data.password),
+      name: data.name,
+    });
   }
 }

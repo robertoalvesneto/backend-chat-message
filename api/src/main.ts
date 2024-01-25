@@ -1,20 +1,25 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { MqttOptions } from '@nestjs/microservices';
 
 import { AppModule } from './app.module';
 import { microserviceOptions } from './common/config/rabbitmq.config';
 import { httpsOptions } from './common/config/http.config';
+import { ClassSerializerInterceptor } from '@nestjs/common';
 
 function sleep(milliseconds: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, milliseconds));
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    httpsOptions,
-  });
+  const app = await NestFactory.create(AppModule, { httpsOptions });
 
   app.connectMicroservice<MqttOptions>(microserviceOptions);
+
+  app.enableCors();
+
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+
+  app.useGlobalGuards();
 
   await app.listen(3000);
 

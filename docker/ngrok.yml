@@ -1,0 +1,16 @@
+version: 2
+
+authtoken: 2bNJiCtD6qGbswCZHfqlejl9V53_62B9PK4K9n3DTZRbLzQDn
+
+tunnels:
+  web:
+    addr: 3000 # Porta local do seu servidor web
+    proto: http
+
+  mqtt:
+    addr: 8883 # Porta local do seu servidor MQTT
+    proto: tcp
+
+  websocket:
+    addr: 15676 # Porta local do seu servidor WebSocket 
+    proto: http

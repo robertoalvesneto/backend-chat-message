@@ -8,6 +8,8 @@ import { dbMongoConfigOptions } from './common/config/mongo.config';
 import { UserModule } from './model/users/user.module';
 import { AuthModule } from './model/auth/auth.module';
 import { ChatModule } from './queue/chat/chat.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -17,5 +19,7 @@ import { ChatModule } from './queue/chat/chat.module';
     UserModule,
     ChatModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

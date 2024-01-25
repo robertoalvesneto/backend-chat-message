@@ -9,6 +9,10 @@ export class User {
 
   @Column()
   @IsString()
+  name: string;
+
+  @Column()
+  @IsString()
   @Exclude({ toPlainOnly: true })
   password: string;
 }

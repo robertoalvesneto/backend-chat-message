@@ -3,6 +3,17 @@ FROM rabbitmq:3.11.13-management-alpine
 COPY ./docker/dockerfiles/rabbitmq/rabbitmq.conf /etc/rabbitmq
 COPY ./docker/dockerfiles/rabbitmq/definitions.json /etc/rabbitmq
 
+# Copy SSL certificates
+COPY ./docker/certs/echochat.cloud/fullchain1.pem /etc/rabbitmq/certs/mqtts/
+COPY ./docker/certs/echochat.cloud/privkey1.pem /etc/rabbitmq/certs/mqtts/
+
+COPY ./docker/certs/echochat.cloud/fullchain1.pem /etc/rabbitmq/certs/wss/
+COPY ./docker/certs/echochat.cloud/privkey1.pem /etc/rabbitmq/certs/wss/
+
+RUN chmod 664 /etc/rabbitmq/certs/mqtts/*
+RUN chmod 664 /etc/rabbitmq/certs/wss/*
+
+
 RUN cat /etc/rabbitmq/rabbitmq.conf
 RUN rabbitmq-plugins enable --offline rabbitmq_mqtt rabbitmq_web_stomp rabbitmq_stomp rabbitmq_web_mqtt rabbitmq_amqp1_0
 CMD ["rabbitmq-server"]

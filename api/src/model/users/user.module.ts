@@ -9,5 +9,6 @@ import { MqttModule } from 'src/queue/mqtt/mqtt.module';
   imports: [TypeOrmModule.forFeature([User]), MqttModule],
   providers: [UserService],
   controllers: [UserController],
+  exports: [UserService],
 })
 export class UserModule {}
