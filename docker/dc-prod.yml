@@ -1,43 +1,97 @@
 version: "3.8"
 
-# Up production container to team lead and client can homolog the features
 services:
-  sgrid-api-prod:
-    container_name: sgrid-api-prod
+  echo-api-prod:
+    container_name: echo-api-prod
     build:
       context: ../
       dockerfile: ./docker/dockerfiles/Dockerfile.api
       target: production
-    command: npm run start
+    command: npm run start:debug
+    restart: always
     env_file:
       - ../envs/.production.env
+    volumes:
+      - ../api:/usr/src/api
+      - /usr/src/api/node_modules
     networks:
-      - sgrid-network
+      - echo-network
     ports:
       - 3000:3000
     depends_on:
-      - sgrid-postgres-prod
+      echo-postgres:
+        condition: service_healthy
+      echo-mongodb:
+        condition: service_healthy
+      echo-rabbitmq:
+        condition: service_healthy
 
-  sgrid-postgres-prod:
-    container_name: sgrid-postgres-prod
+  echo-mongodb:
+    image: mongo
+    container_name: echo-mongodb
+    env_file:
+      - ../envs/.production.env
+    networks:
+      - echo-network
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  echo-postgres:
+    container_name: echo-postgres
     build:
       context: ../
       dockerfile: ./docker/dockerfiles/postgres/Dockerfile.postgres
+    restart: always
     env_file:
       - ../envs/.production.env
-    command:
-      - "-p 5432"
+    volumes:
+      - echo_dev_db_data:/var/lib/postgresql/data
     networks:
-      - sgrid-network
+      - echo-network
     ports:
       - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  echo-rabbitmq:
+    container_name: echo-rabbitmq
+    build:
+      context: ../
+      dockerfile: ./docker/dockerfiles/rabbitmq/Dockerfile.rabbitmq
+    networks:
+      - echo-network
+    ports:
+      - 5671:5671
+      - 1883:1883
+      - 15671:15671
+      - 15672:15672
+      - 15675:15675
     volumes:
-      - sgrid_prod_db_sql_prod:/var/lib/postgresql/data
+      - echo_dev_rabbitmq_data:/var/lib/rabbitmq/
+      - echo_dev_rabbitmq_log:/var/log/rabbitmq/
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
-  sgrid-network:
-    name: docker_sgrid-network
-    external: true
+  echo-network:
+    name: echo-network
+    driver: bridge
 
 volumes:
-  sgrid_prod_db_sql_prod:
+  echo_dev_db_data:
+    name: echo_dev_db_data
+  echo_dev_rabbitmq_data:
+    name: echo_dev_rabbitmq_data
+  echo_dev_rabbitmq_log:
+    name: echo_dev_rabbitmq_log

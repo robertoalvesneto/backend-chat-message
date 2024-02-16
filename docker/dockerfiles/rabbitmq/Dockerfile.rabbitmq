@@ -4,11 +4,11 @@ COPY ./docker/dockerfiles/rabbitmq/rabbitmq.conf /etc/rabbitmq
 COPY ./docker/dockerfiles/rabbitmq/definitions.json /etc/rabbitmq
 
 # Copy SSL certificates
-COPY ./docker/certs/echochat.cloud/fullchain1.pem /etc/rabbitmq/certs/mqtts/
-COPY ./docker/certs/echochat.cloud/privkey1.pem /etc/rabbitmq/certs/mqtts/
+COPY ./docker/certs/www.echochat.cloud/fullchain1.pem /etc/rabbitmq/certs/mqtts/
+COPY ./docker/certs/www.echochat.cloud/privkey1.pem /etc/rabbitmq/certs/mqtts/
 
-COPY ./docker/certs/echochat.cloud/fullchain1.pem /etc/rabbitmq/certs/wss/
-COPY ./docker/certs/echochat.cloud/privkey1.pem /etc/rabbitmq/certs/wss/
+COPY ./docker/certs/www.echochat.cloud/fullchain1.pem /etc/rabbitmq/certs/wss/
+COPY ./docker/certs/www.echochat.cloud/privkey1.pem /etc/rabbitmq/certs/wss/
 
 RUN chmod 664 /etc/rabbitmq/certs/mqtts/*
 RUN chmod 664 /etc/rabbitmq/certs/wss/*

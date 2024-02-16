@@ -1,6 +1,6 @@
 // NPM Modules
 import { JwtPayload, jwtDecode } from 'jwt-decode';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 // Aux
@@ -51,19 +51,19 @@ export class AuthService {
 
   /**
    * Get user and create object, if find user;
-   * @param email (string);
+   * @param name (string);
    * @param password (string);
    * @return UserValidated if login work, else null;
    * @throws [
-   *    404 NOT FOUND           -       cant get user by email;
+   *    404 NOT FOUND           -       cant get user by name;
    *    ]
    */
   async validateUser(
-    uuid: string,
+    name: string,
     pass: string,
   ): Promise<UserValidated | null> {
     try {
-      const user: User = await this.userService.getOne(uuid);
+      const user: User = await this.userService.getOne(name);
       if (user && hashCompare(pass, user.password)) {
         const response = <UserValidated>{
           id: user.id,
@@ -75,28 +75,29 @@ export class AuthService {
 
       return null;
     } catch (e) {
-      throw new HttpException('NOT FOUND', HttpStatus.NOT_FOUND);
+      throw new UnauthorizedException();
     }
   }
 
   /**
    * Check if user pass in token exist in database
-   * @param email (string);
+   * @param name (string);
    * @return true;
    * @throws [
-   *    404 NOT FOUND           -       cant get user by email;
+   *    404 NOT FOUND           -       cant get user by name;
    *    401 UNAUTHORIZED        -       user unauthorized;
    *    ]
    */
-  async userExist(uuid: string): Promise<boolean> {
+  async userExist(sub: string, name: string): Promise<boolean> {
     try {
-      const user: User = await this.userService.getOne(uuid);
+      const username = name + '#' + sub.split('-')[1];
+      const user: User = await this.userService.getOne(username);
 
       if (user) return true;
 
-      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException();
     } catch (e) {
-      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException();
     }
   }
 
@@ -111,7 +112,6 @@ export class AuthService {
     const response = this.createAccessToken(payload);
     response.user = user;
 
-    console.log('oi');
     return response;
   }
 

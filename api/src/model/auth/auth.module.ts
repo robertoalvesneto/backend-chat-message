@@ -15,7 +15,7 @@ import { AuthService } from './auth.service';
 // jwt
 import { jwtConstants } from '../../common/config/jwt-token-secret-key.config';
 import { JwtStrategy } from './jwt/jwt.strategy';
-import { JwtMqttStrategy } from './jwt/jwt-mqtt-strategy';
+import { JwtAuthGuard } from './jwt/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -26,7 +26,15 @@ import { JwtMqttStrategy } from './jwt/jwt-mqtt-strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtMqttStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 
-import { generateUniqueHash } from 'src/common/function/hash.function';
 import { Message } from './dto/message.schema';
 import {
   MessageDto,
@@ -11,7 +10,9 @@ import {
   ReceiverMessageDto,
 } from './dto/message.dto';
 import { MqttService } from '../mqtt/mqtt.service';
+import { PublicClass } from 'src/common/decorator/public-rote.decorator';
 
+@PublicClass()
 @Injectable()
 export class ChatService {
   constructor(
@@ -31,20 +32,20 @@ export class ChatService {
       console.log(`\x1b[94m > ${msg.sender}: \x1b[0m` + JSON.stringify(msg));
 
       // add infos to message
-      const chatName = generateUniqueHash(msg.sender, msg.receiver);
-      msg.chatName = chatName;
+      //const chatName = generateUniqueHash(msg.sender, msg.receiver);
+      //msg.chatName = chatName;
       msg.status = 1;
 
       // save message into database
       const newMessage = new this.messageModel(msg);
       await newMessage.save();
 
-      this.sSaveStatus(msg);
+      //this.sSaveStatus(msg);
 
       console.log('\x1b[94m > MENSAGEM SALVA: \x1b[0m\n\n');
     } catch (e) {
       console.log(e);
-      this.eResponseStatus(msg);
+      //this.eResponseStatus(msg);
       return new Nack(false);
     }
   }
@@ -71,16 +72,17 @@ export class ChatService {
         );
 
         // send message to receiver
-        this.mqttService.publish(checkMsg.receiver, msgDto, 2);
+        this.mqttService.publish(checkMsg.receiver, msgDto, 0);
 
-        this.sDeliveryStatus(msgDto);
+        //this.sDeliveryStatus(msgDto);
 
         // delete this message from database
         await this.messageModel.findByIdAndDelete(msg.id);
 
         console.log('\n\n');
       } catch (e) {
-        this.eResponseStatus(msg);
+        console.log(e);
+        //this.eResponseStatus(msg);
         return new Nack(false);
       }
     });
@@ -102,12 +104,12 @@ export class ChatService {
       );
 
       // send publickey to receiver
-      this.mqttService.publish(pubkeyMsg.receiver, pubkeyMsg, 2);
+      this.mqttService.publish(pubkeyMsg.receiver, pubkeyMsg, 0);
 
-      this.sDeliveryStatus(pubkeyMsg);
+      //this.sDeliveryStatus(pubkeyMsg);
     } catch (e) {
       console.log(e);
-      this.eResponseStatus(pubkeyMsg);
+      //this.eResponseStatus(pubkeyMsg);
       return new Nack(false);
     }
   }

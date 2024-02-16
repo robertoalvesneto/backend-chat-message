@@ -8,13 +8,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { InsertResult, UpdateResult } from 'typeorm';
+import { UpdateResult } from 'typeorm';
 
 // Services
 import { UserService } from './user.service';
 
 // Entities
-import { User } from './entity/user.entity';
 import { UserDto } from './dto/user.dto';
 import { PublicProp } from 'src/common/decorator/public-rote.decorator';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
@@ -24,14 +23,15 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  getOne(@Param('id') id: string): Promise<User> {
-    return this.userService.getOne(id);
+  @Get(':name')
+  async getOne(@Param('name') name: string): Promise<{ name: string }> {
+    const user = await this.userService.getOne(name);
+    return { name: user.name + '#' + user.id.split('-')[1] };
   }
 
   @PublicProp()
   @Post()
-  create(@Body() data: UserDto): Promise<InsertResult> {
+  create(@Body() data: UserDto): Promise<{ name: string }> {
     return this.userService.create(data);
   }
 

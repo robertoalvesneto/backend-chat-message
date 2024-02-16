@@ -25,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const { sub, name } = payload;
 
     return await this.authService
-      .userExist(sub)
+      .userExist(sub, name)
       .then(() => <UserValidated>{ id: sub, name: name });
   }
 }

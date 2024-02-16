@@ -1,3 +1,4 @@
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { MqttOptions } from '@nestjs/microservices';
 
@@ -11,13 +12,32 @@ function sleep(milliseconds: number): Promise<void> {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { httpsOptions });
+  const app =
+    process.env.NODE_ENV === 'DEVELOPMENT'
+      ? await NestFactory.create(AppModule, { httpsOptions })
+      : await NestFactory.create(AppModule);
 
   app.connectMicroservice<MqttOptions>(microserviceOptions);
 
   app.enableCors();
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Smart Security API')
+    .setDescription(
+      'Documentação OpenAPI do back-end Tracking do projeto Smart Security - Femtolab | Cal-Comp',
+    )
+    .setVersion('1.0')
+    .build();
+
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, swaggerDocument);
+
+  app.enableCors({
+    origin: true, // permitir solicitações de todas as origens
+    credentials: true, // permitir solicitações com credenciais
+  });
 
   app.useGlobalGuards();
 
@@ -33,5 +53,8 @@ async function bootstrap() {
       ' |_____\\____|_| |_|\\___/  |_|  |_|_____|____/____/_/   \\_\\____|_____|_| \\_\\\n' +
       '                                                                          ',
   );
+
+  console.log(`Application is running on: ${await app.getUrl()}`);
+  console.log(`Application is running on: ${await app.getUrl()}/api/docs`);
 }
 bootstrap();

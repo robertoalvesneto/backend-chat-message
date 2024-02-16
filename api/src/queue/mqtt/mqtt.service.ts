@@ -1,6 +1,9 @@
 import { ClientProxy, MqttRecordBuilder } from '@nestjs/microservices';
 import { Injectable, Inject } from '@nestjs/common';
+import { PublicClass } from 'src/common/decorator/public-rote.decorator';
 
+
+@PublicClass()
 @Injectable()
 export class MqttService {
   constructor(@Inject('API_v1') private readonly client: ClientProxy) {}

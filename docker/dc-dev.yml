@@ -69,10 +69,14 @@ services:
     networks:
       - echo-network
     ports:
-      - 8883:8883   # mqtts
-      - 15672:15672 # interface
-      - 15675:15675 # ws
-      - 15676:15676 # wss
+      - 5672:5672
+      - 5671:5671
+      - 1883:1883
+      - 8883:8883
+      - 15671:15671
+      - 15672:15672
+      - 15675:15675
+      - 15676:15676
     volumes:
       - echo_dev_rabbitmq_data:/var/lib/rabbitmq/
       - echo_dev_rabbitmq_log:/var/log/rabbitmq/

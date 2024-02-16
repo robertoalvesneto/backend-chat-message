@@ -9,9 +9,9 @@ COPY ./api/tsconfig*.json ./
 RUN npm i --omit=dev --ignore-scripts
 
 # Copy SSL certificates
-COPY ./docker/certs/echochat.cloud/fullchain1.pem /usr/share/certs/api/
-COPY ./docker/certs/echochat.cloud/privkey1.pem /usr/share/certs/api/
-COPY ./docker/certs/echochat.cloud/cert1.pem /usr/share/certs/api/
+COPY ./docker/certs/www.echochat.cloud/fullchain1.pem /usr/share/certs/api/
+COPY ./docker/certs/www.echochat.cloud/privkey1.pem /usr/share/certs/api/
+COPY ./docker/certs/www.echochat.cloud/cert1.pem /usr/share/certs/api/
 
 
 RUN chown -R node:node /usr/share/certs/api
@@ -38,9 +38,9 @@ COPY ./api/tsconfig*.json ./
 COPY ./envs/.production.env ./.env
 
 # Copy SSL certificates
-COPY ./docker/certs/echochat.cloud/fullchain1.pem /usr/share/certs/api/
-COPY ./docker/certs/echochat.cloud/privkey1.pem /usr/share/certs/api/
-COPY ./docker/certs/echochat.cloud/cert1.pem /usr/share/certs/api/
+COPY ./docker/certs/www.echochat.cloud/fullchain1.pem /usr/share/certs/api/
+COPY ./docker/certs/www.echochat.cloud/privkey1.pem /usr/share/certs/api/
+COPY ./docker/certs/www.echochat.cloud/cert1.pem /usr/share/certs/api/
 
 RUN chmod 664 /usr/share/certs/api/*
 
